@@ -4,6 +4,7 @@ using pda::LongNumber;
 		
 LongNumber::LongNumber() {
 	length = 0;
+	numbers = nullptr;
 }
 
 LongNumber::LongNumber(const char* const str) {
@@ -23,24 +24,20 @@ LongNumber::LongNumber(const char* const str) {
 	}
 }
 
-LongNumber::LongNumber(const LongNumber& x) {
-	numbers = new int[length];
+LongNumber::LongNumber(const LongNumber& x) : length(x.length), sign(x.sign) {
+    numbers = new int[length];
     std::copy(x.numbers, x.numbers + length, numbers);
 }
 
-LongNumber::LongNumber(LongNumber&& x) {
-	x.numbers = nullptr;
+LongNumber::LongNumber(LongNumber&& x) noexcept 
+    : numbers(x.numbers), length(x.length), sign(x.sign) {
+    x.numbers = nullptr;
     x.length = 0;
     x.sign = 0;
 }
 
 LongNumber::~LongNumber() {
-	if (numbers) {
-        delete[] numbers;
-    }
-    numbers = nullptr;
-    length = 0;
-    sign = 0;
+	delete[] numbers;
 }
 
 LongNumber& LongNumber::operator = (const char* const str) {
