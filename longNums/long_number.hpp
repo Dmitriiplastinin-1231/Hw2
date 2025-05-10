@@ -1,9 +1,11 @@
 #pragma once
 
 #include <iostream>
+#include <algorithm>
 #include <string>
+#include <cmath>
 
-namespace pda {
+namespace naa {
 	class LongNumber {
 		private:
 			int* numbers;

@@ -4,8 +4,10 @@
 
 int main()
 {
-    pda::LongNumber a {"2000"};
-    pda::LongNumber b {"400"};
-    std:: cout << (a-b) << std::endl;
+    naa::LongNumber a {"2000"};
+    naa::LongNumber b {"400"};
+    naa::LongNumber c {"-1"};
+
+    std:: cout << (a / (b)) << std::endl;
     return 0;
 }
