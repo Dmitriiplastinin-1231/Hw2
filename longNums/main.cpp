@@ -4,10 +4,14 @@
 
 int main()
 {
-    naa::LongNumber a {"2000"};
-    naa::LongNumber b {"400"};
-    naa::LongNumber c {"-1"};
+    pda::LongNumber a {"2000"};
+    pda::LongNumber b {"200"};
+    pda::LongNumber c {"-3"};
 
-    std:: cout << (a / (b)) << std::endl;
+    std:: cout << ((a + b)) << std::endl;
+    std:: cout << ((a - b)) << std::endl;
+    std:: cout << ((b*c)) << std::endl;
+    std:: cout << ((a * b)) << std::endl;
+    // std:: cout << (a / (b)) << std::endl;
     return 0;
 }

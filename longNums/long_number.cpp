@@ -2,11 +2,20 @@
 
 
 
-using naa::LongNumber;
+using pda::LongNumber;
 		
 LongNumber::LongNumber() : numbers(nullptr), length(0), sign(0) {}
 
 LongNumber::LongNumber(const char* const str) {
+
+	// if (str[1] == '\0' && str[0] == '0')
+	// {
+	// 	length = 1;
+	// 	numbers = new int[length];
+	// 	numbers[0] = 0;
+	// 	return;
+	// }
+
 	this->length = this->get_length(str);
 
 	
@@ -282,7 +291,7 @@ LongNumber LongNumber::operator * (const LongNumber& x) const {
 	int max_buffer_length = this->length + x.length;
 	int* buffer = new int[max_buffer_length]();
 	int result_length = 0;
-  
+	
 	int sign = this->sign ^ x.sign;
   
 	for (int i = 0; i < this->length; i++) {
@@ -294,7 +303,8 @@ LongNumber LongNumber::operator * (const LongNumber& x) const {
 		  buffer[i + j] %= 10;
 		  ++result_length;
 		}
-	  }
+	}
+	std::cout << buffer[0] << std::endl;
 	}
   
 	if (sign) {
@@ -312,7 +322,6 @@ LongNumber LongNumber::operator * (const LongNumber& x) const {
 	  }
 	}
 	res[result_length] = '\0';
-  
 	LongNumber ans{res};
 	delete[] buffer;
 	delete[] res;
@@ -325,93 +334,91 @@ LongNumber LongNumber::operator / (const LongNumber& x) const {
     if (x.length == 1 && x.numbers[0] == 0) {
         throw std::runtime_error("Division by zero");
     }
-
+    
     // Проверка если делимое равно нулю
-    if (length == 1 && numbers[0] == 0) {
+    if (this->length == 1 && this->numbers[0] == 0) {
         return LongNumber("0");
     }
-
+    
     // Определение знака результата
-    int result_sign = sign ^ x.sign;
-
-    // Создаем копии для работы с абсолютными значениями
-    LongNumber dividend = *this;
-    dividend.sign = 0;
-    LongNumber divisor = x;
-    divisor.sign = 0;
-
-    // Если делимое меньше делителя
+    int result_sign = this->sign ^ x.sign;
+    
+    // Работаем с абсолютными значениями чисел
+    LongNumber dividend = this->sign ? (*this * LongNumber("-1")) : *this;
+    LongNumber divisor = x.sign ? (x * LongNumber("-1")) : x;
+    
+    // Если делимое меньше делителя, результат 0
     if (dividend < divisor) {
         return LongNumber("0");
     }
-
-    // Если числа равны
+    
+    // Если числа равны, результат 1 с нужным знаком
     if (dividend == divisor) {
         LongNumber result("1");
         result.sign = result_sign;
         return result;
     }
-
-    // Специальный случай: деление на 1
+    
+    // Случай, когда делитель равен 1
     if (divisor.length == 1 && divisor.numbers[0] == 1) {
-        dividend.sign = result_sign;
-        return dividend;
+        LongNumber result = dividend;
+        result.sign = result_sign;
+        return result;
     }
-
-    // Инициализация результата
-    LongNumber result("0");
-    LongNumber current("0");
-
-    // Основной цикл деления
+    
+    // Алгоритм длинного деления
+    LongNumber quotient("0");
+    LongNumber remainder("0");
+    
     for (int i = 0; i < dividend.length; i++) {
-        current = current * LongNumber("10");
-        current = current + LongNumber(std::to_string(dividend.numbers[i]).c_str());
-
-        // Находим цифру для частного
-        int digit = 0;
-        LongNumber multiple("0");
-        while (digit <= 9) {
-            LongNumber temp = divisor * LongNumber(std::to_string(digit).c_str());
-            if (temp > current) {
+        // Добавляем следующую цифру к остатку
+        remainder = remainder * LongNumber("10") + LongNumber(std::to_string(dividend.numbers[i]).c_str());
+        
+        // Находим максимальное k, такое что divisor * k <= remainder
+        int k = 0;
+        LongNumber product("0");
+        while (k <= 9) {
+            LongNumber temp = divisor * LongNumber(std::to_string(k).c_str());
+            if (temp > remainder) {
                 break;
             }
-            multiple = temp;
-            digit++;
+            product = temp;
+            k++;
         }
-        digit--;
-
+        k--;
+        
         // Добавляем цифру к результату
-        result = result * LongNumber("10") + LongNumber(std::to_string(digit).c_str());
-
-        // Вычитаем из текущего остатка
-        current = current - multiple;
+        quotient = quotient * LongNumber("10") + LongNumber(std::to_string(k).c_str());
+        
+        // Вычитаем product из remainder
+        remainder = remainder - product;
     }
-
-    // Удаление ведущих нулей
+    
+    // Удаляем ведущие нули
     int leading_zeros = 0;
-    while (leading_zeros < result.length && result.numbers[leading_zeros] == 0) {
+    while (leading_zeros < quotient.length && quotient.numbers[leading_zeros] == 0) {
         leading_zeros++;
     }
-
+    
     if (leading_zeros > 0) {
-        if (leading_zeros == result.length) {
+        if (leading_zeros == quotient.length) {
             return LongNumber("0");
         }
-
+        
         LongNumber trimmed;
-        trimmed.length = result.length - leading_zeros;
+        trimmed.length = quotient.length - leading_zeros;
         trimmed.numbers = new int[trimmed.length];
         trimmed.sign = result_sign;
-
+        
         for (int i = 0; i < trimmed.length; i++) {
-            trimmed.numbers[i] = result.numbers[i + leading_zeros];
+            trimmed.numbers[i] = quotient.numbers[i + leading_zeros];
         }
-
+        
         return trimmed;
     }
-
-    result.sign = result_sign;
-    return result;
+    
+    quotient.sign = result_sign;
+    return quotient;
 }
 
 LongNumber LongNumber::operator % (const LongNumber& x) const {
@@ -419,20 +426,18 @@ LongNumber LongNumber::operator % (const LongNumber& x) const {
     if (x.length == 1 && x.numbers[0] == 0) {
         throw std::runtime_error("Division by zero");
     }
-
-    // Если делимое меньше делителя
+    
+    // Если делимое меньше делителя, остаток равен делимому
     if (*this < x) {
         return *this;
     }
-
+    
     // Вычисляем частное
     LongNumber quotient = *this / x;
-
-    // Вычисляем остаток
+    
+    // Вычисляем остаток: this - (quotient * x)
     LongNumber remainder = *this - (quotient * x);
-
-    // Корректировка знака остатка
-    remainder.sign = sign; // Остаток сохраняет знак делимого
+    
     return remainder;
 }
 
@@ -461,7 +466,7 @@ int LongNumber::get_length(const char* const str) const noexcept {
 // ----------------------------------------------------------
 // FRIENDLY
 // ----------------------------------------------------------
-namespace naa {
+namespace pda {
 	std::ostream& operator << (std::ostream &os, const LongNumber& x)
 	{
 		if (x.sign)

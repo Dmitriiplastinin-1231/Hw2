@@ -5,7 +5,7 @@
 #include <string>
 #include <cmath>
 
-namespace naa {
+namespace pda {
 	class LongNumber {
 		private:
 			int* numbers;
@@ -29,6 +29,7 @@ namespace naa {
 			bool operator > (const LongNumber& x) const;
 			bool operator < (const LongNumber& x) const;
 			
+			LongNumber operator - () const;
 			LongNumber operator + (const LongNumber& x) const;
 			LongNumber operator - (const LongNumber& x) const;
 			LongNumber operator * (const LongNumber& x) const;
