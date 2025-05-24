@@ -8,5 +8,6 @@ add_subdirectory(lib/googletest)
 add_subdirectory(HoareSort)
 add_subdirectory(refactoring)
 add_subdirectory(unit_test_HoareSort)
+add_subdirectory(longNums)
 
 set(CMAKE_SUPPRESS_REGENERATION true)

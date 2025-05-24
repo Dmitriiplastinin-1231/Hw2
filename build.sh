@@ -1,27 +1,18 @@
+#!/bin/bash
 
 BUILD_TYPE="Ninja"
-SOURCE_FOLDER="Hw"
+BUILD_SUFFIX="ninja"
 
-cmake -G ${BUILD_TYPE} ../${SOURCE_FOLDER}
+BUILD_FOLDER="build_$BUILD_SUFFIX"
+SOURCE_FOLDER="."
+
+if [ ! -d "$BUILD_FOLDER" ]; then
+    mkdir "$BUILD_FOLDER"
+fi
+
+cd "$BUILD_FOLDER"
+
+cmake -G "$BUILD_TYPE" "../$SOURCE_FOLDER"
 cmake --build .
 
-mkdir build
-exclude_dirs="lib CMakeFiles unit_test_HoareSort build"
-
-for dir in */; do
-    dir=${dir%/}
-    exclude=0
-    for exclude_dir in $exclude_dirs; do
-        if [ "$dir" = "$exclude_dir" ]; then
-            exclude=1
-            break
-        fi
-    done
-
-    if [ $exclude -eq 0 ]; then
-        mkdir "build/$dir"
-        mv "./$dir/$dir" "./build/$dir/$dir"
-    fi
-done
-
-ctest -j N --output-on-failure
+cd ..
