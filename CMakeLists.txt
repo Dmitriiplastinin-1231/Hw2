@@ -9,5 +9,7 @@ add_subdirectory(HoareSort)
 add_subdirectory(refactoring)
 add_subdirectory(unit_test_HoareSort)
 add_subdirectory(longNums)
+add_subdirectory(vector)
+add_subdirectory(doubly_linked_list)
 
 set(CMAKE_SUPPRESS_REGENERATION true)
